@@ -1,6 +1,6 @@
 package es;
 
-import es.ui.MainFrame;
+import es.ui.StrategyForm;
 
 /**
  *
@@ -8,10 +8,8 @@ import es.ui.MainFrame;
  */
 public class Main {
     
-      public static void main(String args[]) {
-     
-        java.awt.EventQueue.invokeLater(() -> {
-            new MainFrame().setVisible(true);
-        });
+    public static void main(String args[]) {
+    	StrategyForm mainForm = new StrategyForm();
+
     }
 }

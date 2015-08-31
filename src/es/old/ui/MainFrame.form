@@ -182,7 +182,7 @@
         <Property name="text" type="java.lang.String" value="INPUT"/>
       </Properties>
     </Component>
-    <Container class="es.ui.PaintPanel" name="outputPanel">
+    <Container class="es.old.ui.PaintPanel" name="outputPanel">
 
       <Layout>
         <DimensionLayout dim="0">

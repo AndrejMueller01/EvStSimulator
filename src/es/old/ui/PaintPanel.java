@@ -1,6 +1,6 @@
-package es.ui;
+package es.old.ui;
 
-import es.EsPoint;
+import es.old.EsPoint;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;

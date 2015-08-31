@@ -1,6 +1,6 @@
-package es.ui;
+package es.old.ui;
 
-import es.EsCalculator;
+import es.old.EsCalculator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JLabel;
@@ -37,7 +37,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
-        outputPanel = new es.ui.PaintPanel();
+        outputPanel = new PaintPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -243,7 +243,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JComboBox modeComboBox;
     private javax.swing.JLabel modeLabel;
-    private es.ui.PaintPanel outputPanel;
+    private PaintPanel outputPanel;
     private javax.swing.JButton runButton;
     private javax.swing.JSlider sizeOfPopSlider;
     private javax.swing.JLabel sizzOfPopLabel;
