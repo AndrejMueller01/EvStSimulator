@@ -1,6 +1,7 @@
 package es;
 
 import es.ui.StrategyForm;
+import es.util.Candidate;
 import es.util.Quality;
 
 import java.util.ArrayList;
@@ -10,14 +11,16 @@ import java.util.Random;
  * Created by AM on 01.09.2015.
  */
 public class StrategyMuPlusLambda extends Strategy {
-    private final double ALPHA = 0.85;
+    private final double ALPHA = 1.05;
+	private ArrayList<Integer> stepSizes;
 
-    public StrategyMuPlusLambda(StrategyForm form) {
+
+	public StrategyMuPlusLambda(StrategyForm form) {
         setName("mu+lambda");
         setEpsilon(0);
-        setStepSize(1);
+        stepSizes = new ArrayList<>();
         setPopulationSize(50);
-        setIterations(100000);
+        setIterations(1000);
         setForm(form);
         setPreviousQuality(9999);
         setMu(getPopulationSize() * 10);
@@ -33,30 +36,54 @@ public class StrategyMuPlusLambda extends Strategy {
     }
 
     @Override
-    public String reproductionStep(String father, String mother) {
-
-        char[] child1 = new char[getTargetString().length()];
+    public Candidate reproductionStep(Candidate father, Candidate mother) {
+		Candidate child = new Candidate();
+        char[] childCArray = new char[getTargetString().length()];
 
         // random for now
-        for (int j = 0; j < getTargetString().length(); j++)
-            if ((Math.random() * 2.0) <= 1.0)
-                child1[j] = father.toCharArray()[j];
-            else {
-                child1[j] = mother.toCharArray()[j];
-            }
-        return new String(child1);
+        for (int j = 0; j < getTargetString().length(); j++) {
+			if ((Math.random() * 2.0) <= 1.0) {
+				childCArray[j] = father.getValue().toCharArray()[j];
+			}
+			else {
+				childCArray[j] = mother.getValue().toCharArray()[j];
+			}
+		}
+
+		if ((Math.random() * 2.0) <= 1.0) {
+			if ((Math.random() * 2.0) <= 1.0) {
+				child.setStepWidth(father.getStepWidth() * ALPHA);
+			}else{
+				child.setStepWidth(father.getStepWidth() / ALPHA);
+			}
+		}else {
+			if ((Math.random() * 2.0) <= 1.0) {
+				child.setStepWidth(mother.getStepWidth() * ALPHA);
+			} else {
+				child.setStepWidth(mother.getStepWidth() / ALPHA);
+			}
+		}
+
+		child.setValue(new String(childCArray));
+
+        return child;
     }
 
 
 	@Override
 	public String mutationStep(String candidate) {
-		double stdDeviation = getStepSize()*12;
+		return null;
+	}
+
+	@Override
+	public Candidate mutationStep(Candidate candidate) {
+		double stdDeviation = candidate.getStepWidth();
 		char a = 'a';
 		char z = 'z';
 
 		Random r = new Random();
-		char[] characters = candidate.toCharArray();
-		int pos = (int) (Math.random() * candidate.length());
+		char[] characters = candidate.getValue().toCharArray();
+		int pos = (int) (Math.random() * candidate.getValue().length());
 
 		int value = characters[pos] + Math.abs((int) Math.round(r.nextGaussian() * stdDeviation));
 		while (value > z)
@@ -73,108 +100,77 @@ public class StrategyMuPlusLambda extends Strategy {
 			characters[i] = (char) value;
         }
         */
-		String output = String.valueOf(characters);
+		candidate.setValue(String.valueOf(characters));
+		candidate.setQuality(Quality.function(candidate.getValue(), getTargetString()));
 		//System.out.println(output);
-		return output;
+		return candidate;
 	}
 
-    @Override
+	@Override
     public boolean selectionStep(String candidate) {
         return false;
     }
 
     @Override
-    public ArrayList<String> selectionStep(ArrayList<String> candidates) {
+    public ArrayList<Candidate> selectionStep(ArrayList<Candidate> candidates) {
 
-        ArrayList<Integer> qualities = new ArrayList<>();
-        ArrayList<String> bestChildren = new ArrayList<>();
-        int quality = Integer.MAX_VALUE;
+		ArrayList<Candidate> newCandidates = new ArrayList<>();
 
-        for (int i = 0; i < candidates.size(); i++) {
-            qualities.add(Quality.distance(candidates.get(i), getTargetString()));
-        }
-
+		int quality = Integer.MAX_VALUE;
         int bestQualityIndex = -1;
 
         for (int j = 0; j < getPopulationSize(); j++) {
-
             for (int i = 0; i < candidates.size(); i++) {
-
-                if (qualities.get(i) < quality) {
+                if (candidates.get(i).getQuality() < quality) {
                     bestQualityIndex = i;
-                    quality = qualities.get(i);
+                    quality = candidates.get(i).getQuality();
                 }
             }
-            bestChildren.add(candidates.get(bestQualityIndex));
-            System.out.println("remove quality: " + qualities.get(bestQualityIndex) + " candidate: " + candidates.get(bestQualityIndex));
+			Candidate newCandy = new Candidate(candidates.get(bestQualityIndex).getValue(), candidates.get(bestQualityIndex).getStepWidth());
+			newCandy.setQuality(Quality.function(newCandy.getValue(), getTargetString()));
+			newCandidates.add(newCandy);
 
             candidates.remove(bestQualityIndex);
-            qualities.remove(bestQualityIndex);
             quality = Integer.MAX_VALUE;
         }
-        return bestChildren;
+
+        return newCandidates;
     }
 
     @Override
     public String evolution() {
 		reset();
         init();
-		
-        ArrayList<String> parents;
-        ArrayList<String> children = new ArrayList<>();
-        ArrayList<String> mutatedChildren = new ArrayList<>();
 
+		stepSizes.clear();
+		for(int i = 0; i < getPopulationSize(); i++)
+			stepSizes.add(1);
 
-        for (int i = 0; i < (getMu()); i++) {
-            parents = rouletteWheel();
-            children.add(reproductionStep(parents.get(0), parents.get(1)));
-            System.out.println("New child: " + children.get(i));
-            mutatedChildren.add(mutationStep(children.get(i)));
+        ArrayList<Candidate> children = new ArrayList<>();
+        ArrayList<Candidate> mutatedChildren = new ArrayList<>();
+        ArrayList<Candidate> newParents = null;
+
+		for (int i = 0; i < getIterations(); i++) {
+			children.clear();
+			mutatedChildren.clear();
+			for (int j = 0; j < getMu(); j++) {
+				newParents = rouletteWheel();
+				children.add(reproductionStep(newParents.get(0), newParents.get(1)));
+				mutatedChildren.add(mutationStep(children.get(j)));
+			}
+			newParents = selectionStep(mutatedChildren);
+			setInitialConfiguration(newParents);
+			if(newParents.get(0).getQuality() == 0)
+				break;
+		}
+
+		for (int i = 0; i < newParents.size(); i++) {
+			Candidate candidate = newParents.get(i);
+			getForm().resultList.append("candidate " + (i + 1) + ": " + candidate.getValue() + " - quality " + candidate.getQuality() + "\n");
+			//getForm().resultList.append( i + ": " + newParents.get(i).getValue()+"\n");
         }
-        ArrayList<String> newParents = selectionStep(mutatedChildren);
-        for (int i = 0; i < newParents.size(); i++) {
-            System.out.println("new Parent " + i + ": " + newParents.get(i));
-        }
 
-
-        return null;
- /*
-        String temp = getInitialConfiguration().get(0);
-        String previousParent = temp;
-
-        int numberOfPositiveMutations = 0;
-
-        getForm().resultList.append("Iteration " + 0 + ": " + temp + "\n");
-
-        int i;
-        for (i = 0; i < getIterations(); i++) {
-            //System.out.println("#" + i + ": temp = " + temp + "(" + LevenshteinDistance.distance(temp, getTargetString()) + "); previousParent = " + previousParent + "(" + LevenshteinDistance.distance(previousParent, getTargetString()) + ")");
-
-            String afterMutation = mutationStep(temp);
-            //System.out.println("#" + i + ": afterMutation = " + afterMutation);
-
-            if (selectionStep(afterMutation)) {
-                previousParent = temp;
-                temp = afterMutation;
-                numberOfPositiveMutations++;
-                getForm().resultList.append("Iteration " + (i + 1) + ": " + temp + "\n");
-                System.out.println("" + i + " " + temp);
-
-                if (i > 0) {
-                    if (Math.abs(LevenshteinDistance.distance(previousParent, getTargetString()) - LevenshteinDistance.distance(temp, getTargetString())) <= getEpsilon()) {
-                        break;
-                    } else {
-                        if (numberOfPositiveMutations < (numberOfPositiveMutations / i)) {
-                            setStepSize(getStepSize() * ALPHA);
-                        } else {
-                            setStepSize(getStepSize() / ALPHA);
-                        }
-                    }
-                }
-            }
-        }
-        return "Reached '" + temp + "' (distance of " + LevenshteinDistance.distance(temp, getTargetString()) + ") in " + i + " iterations.";
-    */
+        return "Found candidate '" + newParents.get(0).getValue() + "' with quality " + newParents.get(0).getQuality();
     }
 	private void reset() {
 		setEpsilon(getEpsilon());

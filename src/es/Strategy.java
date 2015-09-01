@@ -1,6 +1,7 @@
 package es;
 
 import es.ui.StrategyForm;
+import es.util.Candidate;
 import es.util.Quality;
 import es.util.RandomString;
 
@@ -19,39 +20,41 @@ public abstract class Strategy {
     private int iterations;
     private int mu;
     private String targetString;
-    private ArrayList<String> initialConfiguration;
+    private ArrayList<Candidate> initialConfiguration;
 
     private StrategyForm form;
 
     public abstract void adjustGui();
 
-    public abstract String reproductionStep(String father, String mother);
+    public abstract Candidate reproductionStep(Candidate father, Candidate mother);
 
     public abstract String mutationStep(String candidate);
 
-    public abstract boolean selectionStep(String candidate);
+	public abstract Candidate mutationStep(Candidate candidate);
 
-    public abstract ArrayList<String> selectionStep(ArrayList<String> candidates);
+	public abstract boolean selectionStep(String candidate);
+
+    public abstract ArrayList<Candidate> selectionStep(ArrayList<Candidate> candidates);
 
     public abstract String evolution();
 
     public void init() {
-        setInitialConfiguration(new ArrayList<String>());
+        setInitialConfiguration(new ArrayList<Candidate>());
         int length = targetString.length();
         RandomString rs = new RandomString(length);
         for (int i = 0; i < populationSize; i++) {
-            getInitialConfiguration().add(rs.nextString());
+            getInitialConfiguration().add(new Candidate(rs.nextString(), 1));
         }
     }
 
     // roulette wheel
-    public ArrayList<String> rouletteWheel() {
-        System.out.println("___________________________________ROULETTE WHEEL_________________________________________");
+    public ArrayList<Candidate> rouletteWheel() {
+        //System.out.println("___________________________________ROULETTE WHEEL_________________________________________");
         ArrayList<Integer> invLevenshteinValues = new ArrayList<>();
         int sumOfInvLevValues = 0;
 
         for (int i = 0; i < populationSize; i++) {
-            invLevenshteinValues.add((targetString.length()) - Quality.distance(getInitialConfiguration().get(i), targetString));
+            invLevenshteinValues.add((targetString.length()) - Quality.distance(getInitialConfiguration().get(i).getValue(), targetString));
             sumOfInvLevValues += invLevenshteinValues.get(i);
         }
 
@@ -67,65 +70,29 @@ public abstract class Strategy {
             if (temp >= randomSelection1) {
                 if (indexP1 == -1) {
                     indexP1 = i;
-                    System.out.println("P1: RandomValue: " + temp + " String: " + getInitialConfiguration().get(indexP1) + " index: " + i);
+                    //System.out.println("P1: RandomValue: " + temp + " String: " + getInitialConfiguration().get(indexP1) + " index: " + i);
 
                 }
             }
             if (temp >= randomSelection2) {
                 if (indexP2 == -1) {
                     indexP2 = i;
-                    System.out.println("P2: RandomValue: " + temp + " String: " + getInitialConfiguration().get(indexP2) + " index: " + i);
+                    //System.out.println("P2: RandomValue: " + temp + " String: " + getInitialConfiguration().get(indexP2) + " index: " + i);
 
                 }
             }
         }
 
-        ArrayList<String> parents = new ArrayList<>();
+        ArrayList<Candidate> parents = new ArrayList<>();
+		Candidate candidate1 = getInitialConfiguration().get(indexP1);
+		Candidate candidate2 = getInitialConfiguration().get(indexP2);
 
-        parents.add(getInitialConfiguration().get(indexP1));
-        parents.add(getInitialConfiguration().get(indexP2));
+		parents.add(candidate1);
+        parents.add(candidate2);
 
-        System.out.println("RouletteWheel: P1: " + parents.get(0) + " P2: " + parents.get(1));
-        System.out.println("__________________________________________________________________________________________");
+        //System.out.println("RouletteWheel: P1: " + parents.get(0) + " P2: " + parents.get(1));
+        //System.out.println("__________________________________________________________________________________________");
 
-        return parents;
-    }
-
-    public ArrayList<String> findBestParents() {
-
-        if (populationSize < 2) {
-            return null;
-        }
-
-        int tempDistance = 999;
-        int tempIndex = -1;
-        int tempIndex2 = -1;
-
-
-        // find the best one
-        for (int i = 0; i < populationSize; i++) {
-
-            if (tempDistance > Quality.distance(getInitialConfiguration().get(i), targetString)) {
-                tempDistance = Quality.distance(getInitialConfiguration().get(i), targetString);
-                tempIndex = i;
-            }
-        }
-
-        tempDistance = 999;
-        // find the 2nd best one
-        for (int i = 0; i < populationSize; i++) {
-            if (i != tempIndex)
-                if (tempDistance > Quality.distance(getInitialConfiguration().get(i), targetString)) {
-                    tempDistance = Quality.distance(getInitialConfiguration().get(i), targetString);
-                    tempIndex2 = i;
-                }
-        }
-
-        ArrayList<String> parents = new ArrayList<>();
-        parents.add(getInitialConfiguration().get(tempIndex));
-        parents.add(getInitialConfiguration().get(tempIndex2));
-
-        System.out.println("Best parents: (1: " + parents.get(0) + ") (2: " + parents.get(1) + ")");
         return parents;
     }
 
@@ -185,13 +152,13 @@ public abstract class Strategy {
         this.targetString = targetString;
     }
 
-    public ArrayList<String> getInitialConfiguration() {
+    public ArrayList<Candidate> getInitialConfiguration() {
         return initialConfiguration;
     }
 
-    public void setInitialConfiguration(ArrayList<String> initialConfiguration) {
+    public void setInitialConfiguration(ArrayList<Candidate> initialConfiguration) {
         if (this.initialConfiguration == null)
-            this.initialConfiguration = new ArrayList<String>();
+            this.initialConfiguration = new ArrayList<Candidate>();
         this.initialConfiguration.clear();
         this.initialConfiguration.addAll(initialConfiguration);
     }

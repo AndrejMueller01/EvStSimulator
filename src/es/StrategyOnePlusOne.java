@@ -1,6 +1,7 @@
 package es;
 
 import es.ui.StrategyForm;
+import es.util.Candidate;
 import es.util.Quality;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class StrategyOnePlusOne extends Strategy {
     }
 
     @Override
-    public String reproductionStep(String father, String mother) {
+    public Candidate reproductionStep(Candidate father, Candidate mother) {
         return null;
     }
 
@@ -65,7 +66,12 @@ public class StrategyOnePlusOne extends Strategy {
 		return output;
     }
 
-    @Override
+	@Override
+	public Candidate mutationStep(Candidate candidate) {
+		return null;
+	}
+
+	@Override
     public boolean selectionStep(String candidate) {
         int distance = Quality.function(candidate, getTargetString());
         if (distance < getPreviousQuality()) {
@@ -76,7 +82,7 @@ public class StrategyOnePlusOne extends Strategy {
     }
 
     @Override
-    public ArrayList<String> selectionStep(ArrayList<String> candidates) {
+    public ArrayList<Candidate> selectionStep(ArrayList<Candidate> candidates) {
         return null;
     }
 
@@ -84,7 +90,7 @@ public class StrategyOnePlusOne extends Strategy {
     public String evolution() {
 		reset();
         init();
-        String temp = getInitialConfiguration().get(0);
+        String temp = getInitialConfiguration().get(0).getValue();
 
         int i;
 		int prevQuality = 9999;
