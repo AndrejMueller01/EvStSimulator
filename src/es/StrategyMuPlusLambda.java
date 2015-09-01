@@ -6,16 +6,16 @@ import es.util.LevenshteinDistance;
 import java.util.Random;
 
 /**
- * Created by Johannes on 31/08/2015.
+ * Created by AM on 01.09.2015.
  */
-public class StrategyOnePlusOne extends Strategy {
+public class StrategyMuPlusLambda extends Strategy {
     private final double ALPHA = 0.85;
 
-    public StrategyOnePlusOne(StrategyForm form) {
-        setName("1+1");
+    public StrategyMuPlusLambda(StrategyForm form) {
+        setName("1+lambda");
         setEpsilon(0.05);
         setStepSize(1);
-        setPopulationSize(1);
+        setPopulationSize(50);
         setIterations(100000);
         setForm(form);
         setPreviousQuality(9999);
@@ -26,7 +26,7 @@ public class StrategyOnePlusOne extends Strategy {
         getForm().targetStringTextField.setText("helloworld");
         getForm().iterationsTextField.setText("" + getIterations());
         getForm().populationSizeTextField.setText("" + getPopulationSize());
-        getForm().populationSizeTextField.setEditable(false);
+        getForm().populationSizeTextField.setEditable(true);
     }
 
     @Override
@@ -66,6 +66,10 @@ public class StrategyOnePlusOne extends Strategy {
     @Override
     public String evolution() {
         init();
+
+        rouletteWheel();
+        findBestParents();
+
         String temp = getInitialConfiguration().get(0);
         String previousParent = temp;
 
