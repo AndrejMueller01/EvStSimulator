@@ -17,6 +17,7 @@ public abstract class Strategy {
     private int populationSize;
     private int selectionSize;
     private int iterations;
+    private int mu;
     private String targetString;
     private ArrayList<String> initialConfiguration;
 
@@ -29,6 +30,8 @@ public abstract class Strategy {
     public abstract String mutationStep(String candidate);
 
     public abstract boolean selectionStep(String candidate);
+
+    public abstract ArrayList<String> selectionStep(ArrayList<String> candidates);
 
     public abstract String evolution();
 
@@ -43,6 +46,7 @@ public abstract class Strategy {
 
     // roulette wheel
     public ArrayList<String> rouletteWheel() {
+        System.out.println("___________________________________ROULETTE WHEEL_________________________________________");
         ArrayList<Integer> invLevenshteinValues = new ArrayList<>();
         int sumOfInvLevValues = 0;
 
@@ -52,10 +56,7 @@ public abstract class Strategy {
         }
 
         double randomSelection1 = Math.random() * (double) sumOfInvLevValues;
-        System.out.println(randomSelection1);
         double randomSelection2 = Math.random() * (double) sumOfInvLevValues;
-        System.out.println(randomSelection2);
-
 
         int temp = 0;
         int indexP1 = -1;
@@ -66,14 +67,14 @@ public abstract class Strategy {
             if (temp >= randomSelection1) {
                 if (indexP1 == -1) {
                     indexP1 = i;
-                    System.out.println("P1: Randomvalue: " + temp + " String: " + getInitialConfiguration().get(indexP1) + " index: " + i);
+                    System.out.println("P1: RandomValue: " + temp + " String: " + getInitialConfiguration().get(indexP1) + " index: " + i);
 
                 }
             }
             if (temp >= randomSelection2) {
                 if (indexP2 == -1) {
                     indexP2 = i;
-                    System.out.println("P2: Randomvalue: " + temp + " String: " + getInitialConfiguration().get(indexP2) + " index: " + i);
+                    System.out.println("P2: RandomValue: " + temp + " String: " + getInitialConfiguration().get(indexP2) + " index: " + i);
 
                 }
             }
@@ -85,6 +86,8 @@ public abstract class Strategy {
         parents.add(getInitialConfiguration().get(indexP2));
 
         System.out.println("RouletteWheel: P1: " + parents.get(0) + " P2: " + parents.get(1));
+        System.out.println("__________________________________________________________________________________________");
+
         return parents;
     }
 
@@ -207,5 +210,13 @@ public abstract class Strategy {
 
     public void setPreviousQuality(int previousQuality) {
         this.previousQuality = previousQuality;
+    }
+
+    public int getMu() {
+        return mu;
+    }
+
+    public void setMu(int mu) {
+        this.mu = mu;
     }
 }

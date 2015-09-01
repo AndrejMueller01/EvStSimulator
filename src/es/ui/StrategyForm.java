@@ -38,7 +38,7 @@ public class StrategyForm extends JFrame {
         strategies = new ArrayList<Strategy>();
         strategies.add(onePlusOne);
         strategies.add(muPlusLambda);
-        
+
         for (Strategy strategy : strategies) {
             strategyComboBox.addItem(strategy.getName());
         }
@@ -59,6 +59,8 @@ public class StrategyForm extends JFrame {
                 getSelectedStrategy().setTargetString(targetStringTextField.getText());
                 getSelectedStrategy().setIterations(Integer.parseInt(iterationsTextField.getText()));
                 getSelectedStrategy().setPopulationSize(Integer.parseInt(populationSizeTextField.getText()));
+                getSelectedStrategy().setMu(Integer.parseInt(populationSizeTextField.getText()) * 10);
+
                 JOptionPane.showMessageDialog(null, getSelectedStrategy().evolution());
             }
         });

@@ -3,6 +3,7 @@ package es;
 import es.ui.StrategyForm;
 import es.util.LevenshteinDistance;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -61,6 +62,11 @@ public class StrategyOnePlusOne extends Strategy {
             return true;
         } else
             return false;
+    }
+
+    @Override
+    public ArrayList<String> selectionStep(ArrayList<String> candidates) {
+        return null;
     }
 
     @Override

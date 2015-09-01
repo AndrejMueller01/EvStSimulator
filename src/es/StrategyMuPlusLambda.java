@@ -3,6 +3,7 @@ package es;
 import es.ui.StrategyForm;
 import es.util.LevenshteinDistance;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -19,6 +20,7 @@ public class StrategyMuPlusLambda extends Strategy {
         setIterations(100000);
         setForm(form);
         setPreviousQuality(9999);
+        setMu(getPopulationSize() * 10);
     }
 
     @Override
@@ -27,12 +29,24 @@ public class StrategyMuPlusLambda extends Strategy {
         getForm().iterationsTextField.setText("" + getIterations());
         getForm().populationSizeTextField.setText("" + getPopulationSize());
         getForm().populationSizeTextField.setEditable(true);
+
     }
 
     @Override
     public String reproductionStep(String father, String mother) {
-        return null;
+
+        char[] child1 = new char[getTargetString().length()];
+
+        // random for now
+        for (int j = 0; j < getTargetString().length(); j++)
+            if ((Math.random() * 2.0) <= 1.0)
+                child1[j] = father.toCharArray()[j];
+            else {
+                child1[j] = mother.toCharArray()[j];
+            }
+        return new String(child1);
     }
+
 
     @Override
     public String mutationStep(String candidate) {
@@ -55,21 +69,63 @@ public class StrategyMuPlusLambda extends Strategy {
 
     @Override
     public boolean selectionStep(String candidate) {
-        int distance = LevenshteinDistance.distance(candidate, getTargetString());
-        if (distance < getPreviousQuality()) {
-            setPreviousQuality(distance);
-            return true;
-        } else
-            return false;
+        return false;
+    }
+
+    @Override
+    public ArrayList<String> selectionStep(ArrayList<String> candidates) {
+
+        ArrayList<Integer> qualities = new ArrayList<>();
+        ArrayList<String> bestChildren = new ArrayList<>();
+        int quality = Integer.MAX_VALUE;
+
+        for (int i = 0; i < candidates.size(); i++) {
+            qualities.add(LevenshteinDistance.distance(candidates.get(i), getTargetString()));
+        }
+
+        int bestQualityIndex = -1;
+
+        for (int j = 0; j < getPopulationSize(); j++) {
+
+            for (int i = 0; i < candidates.size(); i++) {
+
+                if (qualities.get(i) < quality) {
+                    bestQualityIndex = i;
+                    quality = qualities.get(i);
+                }
+            }
+            bestChildren.add(candidates.get(bestQualityIndex));
+            System.out.println("remove quality: " + qualities.get(bestQualityIndex) + " candidate: " + candidates.get(bestQualityIndex));
+
+            candidates.remove(bestQualityIndex);
+            qualities.remove(bestQualityIndex);
+            quality = Integer.MAX_VALUE;
+        }
+        return bestChildren;
     }
 
     @Override
     public String evolution() {
         init();
+        ArrayList<String> parents;
+        ArrayList<String> children = new ArrayList<>();
+        ArrayList<String> mutatedChildren = new ArrayList<>();
 
-        rouletteWheel();
-        findBestParents();
 
+        for (int i = 0; i < (getMu()); i++) {
+            parents = rouletteWheel();
+            children.add(reproductionStep(parents.get(0), parents.get(1)));
+            System.out.println("New child: " + children.get(i));
+            mutatedChildren.add(mutationStep(children.get(i)));
+        }
+        ArrayList<String> newParents = selectionStep(mutatedChildren);
+        for (int i = 0; i < newParents.size(); i++) {
+            System.out.println("new Parent " + i + ": " + newParents.get(i));
+        }
+
+
+        return null;
+ /*
         String temp = getInitialConfiguration().get(0);
         String previousParent = temp;
 
@@ -105,5 +161,7 @@ public class StrategyMuPlusLambda extends Strategy {
             }
         }
         return "Reached '" + temp + "' (distance of " + LevenshteinDistance.distance(temp, getTargetString()) + ") in " + i + " iterations.";
+    */
     }
+
 }
