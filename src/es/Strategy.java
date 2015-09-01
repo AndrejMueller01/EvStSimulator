@@ -1,7 +1,7 @@
 package es;
 
 import es.ui.StrategyForm;
-import es.util.LevenshteinDistance;
+import es.util.Quality;
 import es.util.RandomString;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public abstract class Strategy {
         int sumOfInvLevValues = 0;
 
         for (int i = 0; i < populationSize; i++) {
-            invLevenshteinValues.add((targetString.length()) - LevenshteinDistance.distance(getInitialConfiguration().get(i), targetString));
+            invLevenshteinValues.add((targetString.length()) - Quality.distance(getInitialConfiguration().get(i), targetString));
             sumOfInvLevValues += invLevenshteinValues.get(i);
         }
 
@@ -105,8 +105,8 @@ public abstract class Strategy {
         // find the best one
         for (int i = 0; i < populationSize; i++) {
 
-            if (tempDistance > LevenshteinDistance.distance(getInitialConfiguration().get(i), targetString)) {
-                tempDistance = LevenshteinDistance.distance(getInitialConfiguration().get(i), targetString);
+            if (tempDistance > Quality.distance(getInitialConfiguration().get(i), targetString)) {
+                tempDistance = Quality.distance(getInitialConfiguration().get(i), targetString);
                 tempIndex = i;
             }
         }
@@ -115,8 +115,8 @@ public abstract class Strategy {
         // find the 2nd best one
         for (int i = 0; i < populationSize; i++) {
             if (i != tempIndex)
-                if (tempDistance > LevenshteinDistance.distance(getInitialConfiguration().get(i), targetString)) {
-                    tempDistance = LevenshteinDistance.distance(getInitialConfiguration().get(i), targetString);
+                if (tempDistance > Quality.distance(getInitialConfiguration().get(i), targetString)) {
+                    tempDistance = Quality.distance(getInitialConfiguration().get(i), targetString);
                     tempIndex2 = i;
                 }
         }

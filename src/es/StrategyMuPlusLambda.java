@@ -1,7 +1,7 @@
 package es;
 
 import es.ui.StrategyForm;
-import es.util.LevenshteinDistance;
+import es.util.Quality;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -13,8 +13,8 @@ public class StrategyMuPlusLambda extends Strategy {
     private final double ALPHA = 0.85;
 
     public StrategyMuPlusLambda(StrategyForm form) {
-        setName("1+lambda");
-        setEpsilon(0.05);
+        setName("mu+lambda");
+        setEpsilon(0);
         setStepSize(1);
         setPopulationSize(50);
         setIterations(100000);
@@ -48,24 +48,35 @@ public class StrategyMuPlusLambda extends Strategy {
     }
 
 
-    @Override
-    public String mutationStep(String candidate) {
-        double stdDeviation = getStepSize();
-        char a = 'a';
-        char z = 'z';
+	@Override
+	public String mutationStep(String candidate) {
+		double stdDeviation = getStepSize()*12;
+		char a = 'a';
+		char z = 'z';
 
-        Random r = new Random();
-        char[] characters = candidate.toCharArray();
+		Random r = new Random();
+		char[] characters = candidate.toCharArray();
+		int pos = (int) (Math.random() * candidate.length());
+
+		int value = characters[pos] + Math.abs((int) Math.round(r.nextGaussian() * stdDeviation));
+		while (value > z)
+			value -= 26;
+		characters[pos] = (char) value;
+
+		/*
         for (int i = 0; i < candidate.length(); i++) {
-            int value = characters[i] + (int) Math.round(r.nextGaussian() * stdDeviation);
+            int value = characters[pos] + Math.abs((int) Math.round(r.nextGaussian() * stdDeviation));
             while (value > z)
                 value -= 26;
             while (value < a)
                 value += 26;
-            characters[i] = (char) value;
+			characters[i] = (char) value;
         }
-        return String.valueOf(characters);
-    }
+        */
+		String output = String.valueOf(characters);
+		//System.out.println(output);
+		return output;
+	}
 
     @Override
     public boolean selectionStep(String candidate) {
@@ -80,7 +91,7 @@ public class StrategyMuPlusLambda extends Strategy {
         int quality = Integer.MAX_VALUE;
 
         for (int i = 0; i < candidates.size(); i++) {
-            qualities.add(LevenshteinDistance.distance(candidates.get(i), getTargetString()));
+            qualities.add(Quality.distance(candidates.get(i), getTargetString()));
         }
 
         int bestQualityIndex = -1;
@@ -106,7 +117,9 @@ public class StrategyMuPlusLambda extends Strategy {
 
     @Override
     public String evolution() {
+		reset();
         init();
+		
         ArrayList<String> parents;
         ArrayList<String> children = new ArrayList<>();
         ArrayList<String> mutatedChildren = new ArrayList<>();
@@ -163,5 +176,11 @@ public class StrategyMuPlusLambda extends Strategy {
         return "Reached '" + temp + "' (distance of " + LevenshteinDistance.distance(temp, getTargetString()) + ") in " + i + " iterations.";
     */
     }
-
+	private void reset() {
+		setEpsilon(getEpsilon());
+		setStepSize(1.0);
+		setPopulationSize(Integer.parseInt(getForm().populationSizeTextField.getText()));
+		setIterations(Integer.parseInt(getForm().iterationsTextField.getText()));
+		setPreviousQuality(9999);
+	}
 }

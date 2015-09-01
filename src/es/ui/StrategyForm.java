@@ -7,6 +7,8 @@ import es.Strategy;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -21,7 +23,8 @@ public class StrategyForm extends JFrame {
     public JTextField populationSizeTextField;
     public JPanel rootPanel;
     public JTextArea resultList;
-    public ArrayList<Strategy> strategies;
+	private JScrollPane scrollPane;
+	public ArrayList<Strategy> strategies;
 
 
     public StrategyForm() {
@@ -64,7 +67,19 @@ public class StrategyForm extends JFrame {
                 JOptionPane.showMessageDialog(null, getSelectedStrategy().evolution());
             }
         });
-    }
+
+		KeyAdapter kA = new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					runButton.doClick();
+				}
+			}
+		};
+
+		iterationsTextField.addKeyListener(kA);
+		populationSizeTextField.addKeyListener(kA);
+		targetStringTextField.addKeyListener(kA);
+	}
 
     public Strategy getSelectedStrategy() {
         for (Strategy strategy : strategies) {

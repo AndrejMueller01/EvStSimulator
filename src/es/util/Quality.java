@@ -3,7 +3,11 @@ package es.util;
 /**
  * Created by Johannes on 31/08/2015.
  */
-public class LevenshteinDistance {
+public class Quality {
+
+	public static int function(String a, String b) {
+		return custom(a,b);
+	}
 
 	public static int distance(String a, String b) {
 		a = a.toLowerCase();
@@ -23,5 +27,23 @@ public class LevenshteinDistance {
 			}
 		}
 		return costs[b.length()];
+	}
+
+	public static int custom(String candidate, String target) {
+		candidate = candidate.toLowerCase();
+		target = target.toLowerCase();
+		char[] aChars = candidate.toCharArray();
+		char[] bChars = target.toCharArray();
+
+		int quality = 0;
+		for(int i = 0; i < candidate.length(); i++) {
+			int diff = Math.abs(aChars[i] - bChars[i]);
+			float limit = Math.round(('z' - 'a')/2.0);
+			if(diff > limit)
+				quality += ('z' - 'a') - diff;
+			else
+				quality += diff;
+		}
+		return quality;
 	}
 }
