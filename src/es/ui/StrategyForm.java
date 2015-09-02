@@ -1,6 +1,6 @@
 package es.ui;
 
-import es.StrategyMuPlusLambda;
+import es.StrategyMuRhoLambda;
 import es.StrategyOnePlusOne;
 import es.Strategy;
 
@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Created by Johannes on 31/08/2015.
@@ -36,7 +35,7 @@ public class StrategyForm extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Strategy onePlusOne = new StrategyOnePlusOne(this);
-        Strategy muPlusLambda = new StrategyMuPlusLambda(this);
+        Strategy muPlusLambda = new StrategyMuRhoLambda(this);
 
         strategies = new ArrayList<Strategy>();
         strategies.add(onePlusOne);

@@ -10,12 +10,19 @@ import java.util.Random;
 /**
  * Created by AM on 01.09.2015.
  */
-public class StrategyMuPlusLambda extends Strategy {
+public class StrategyMuRhoLambda extends Strategy {
+
     private final double ALPHA = 1.05;
+	private final int MALE = 0;
+	private final int FEMALE = 1;
+	private ArrayList<Candidate> children;
+
+
+
 	private ArrayList<Integer> stepSizes;
 
 
-	public StrategyMuPlusLambda(StrategyForm form) {
+	public StrategyMuRhoLambda(StrategyForm form) {
         setName("mu+lambda");
         setEpsilon(0);
         stepSizes = new ArrayList<>();
@@ -24,6 +31,7 @@ public class StrategyMuPlusLambda extends Strategy {
         setForm(form);
         setPreviousQuality(9999);
         setMu(getPopulationSize() * 10);
+		children = new ArrayList<Candidate>();
     }
 
     @Override
@@ -37,38 +45,70 @@ public class StrategyMuPlusLambda extends Strategy {
 
     @Override
     public Candidate reproductionStep(Candidate father, Candidate mother) {
-		Candidate child = new Candidate();
-        char[] childCArray = new char[getTargetString().length()];
 
-        // random for now
-        for (int j = 0; j < getTargetString().length(); j++) {
+		Candidate child1 = new Candidate();
+		Candidate child2 = new Candidate();
+
+		ArrayList<Integer> reproductionTracker = new ArrayList<>();
+
+        char[] childCArray1 = new char[getTargetString().length()];
+		char[] childCArray2 = new char[getTargetString().length()];
+
+
+		for (int j = 0; j < getTargetString().length(); j++) {
 			if ((Math.random() * 2.0) <= 1.0) {
-				childCArray[j] = father.getValue().toCharArray()[j];
+				childCArray1[j] = father.getValue().toCharArray()[j];
+				reproductionTracker.add(MALE);
 			}
 			else {
-				childCArray[j] = mother.getValue().toCharArray()[j];
+				childCArray1[j] = mother.getValue().toCharArray()[j];
+				reproductionTracker.add(FEMALE);
 			}
 		}
 
-		if ((Math.random() * 2.0) <= 1.0) {
-			if ((Math.random() * 2.0) <= 1.0) {
-				child.setStepWidth(father.getStepWidth() * ALPHA);
-			}else{
-				child.setStepWidth(father.getStepWidth() / ALPHA);
+		for (int j = 0; j < getTargetString().length(); j++) {
+			if (reproductionTracker.get(j) == MALE) {
+				childCArray2[j] = mother.getValue().toCharArray()[j];
 			}
-		}else {
-			if ((Math.random() * 2.0) <= 1.0) {
-				child.setStepWidth(mother.getStepWidth() * ALPHA);
-			} else {
-				child.setStepWidth(mother.getStepWidth() / ALPHA);
+			else {
+				childCArray2[j] = mother.getValue().toCharArray()[j];
 			}
 		}
 
-		child.setValue(new String(childCArray));
+		child1.setStepWidth(calculateStepWidth(father, mother));
+		child2.setStepWidth(calculateStepWidth(father, mother));
 
-        return child;
+		child1.setValue(new String(childCArray1));
+		child2.setValue(new String(childCArray2));
+
+		children.add(child1);
+		children.add(child2);
+
+
+		return child;
     }
 
+	private double calculateStepWidth(Candidate father, Candidate mother){
+		if ((Math.random() * 2.0) <= 1.0) {
+			double random = (Math.random() * 3.0);
+			if ( random <= 1.0) {
+				return (father.getStepWidth() * ALPHA);
+			}else if (random >= 2.0){
+				return (father.getStepWidth() / ALPHA);
+			}else{
+				return (father.getStepWidth());
+			}
+		}else {
+			double random = (Math.random() * 3.0);
+			if ( random <= 1.0) {
+				return (mother.getStepWidth() * ALPHA);
+			}else if (random >= 2.0){
+				return (mother.getStepWidth() / ALPHA);
+			}else{
+				return (mother.getStepWidth());
+			}
+		}
+	}
 
 	@Override
 	public String mutationStep(String candidate) {
@@ -146,7 +186,6 @@ public class StrategyMuPlusLambda extends Strategy {
 		for(int i = 0; i < getPopulationSize(); i++)
 			stepSizes.add(1);
 
-        ArrayList<Candidate> children = new ArrayList<>();
         ArrayList<Candidate> mutatedChildren = new ArrayList<>();
         ArrayList<Candidate> newParents = null;
 
