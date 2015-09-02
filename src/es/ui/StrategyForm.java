@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Created by Johannes on 31/08/2015.
@@ -62,7 +61,7 @@ public class StrategyForm extends JFrame {
                 getSelectedStrategy().setTargetString(targetStringTextField.getText());
                 getSelectedStrategy().setIterations(Integer.parseInt(iterationsTextField.getText()));
                 getSelectedStrategy().setPopulationSize(Integer.parseInt(populationSizeTextField.getText()));
-                getSelectedStrategy().setMu(Integer.parseInt(populationSizeTextField.getText()) * 10);
+                getSelectedStrategy().setLambda(Integer.parseInt(populationSizeTextField.getText()) * 10);
 
                 JOptionPane.showMessageDialog(null, getSelectedStrategy().evolution());
             }

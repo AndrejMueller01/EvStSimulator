@@ -23,7 +23,7 @@ public class StrategyMuPlusLambda extends Strategy {
         setIterations(1000);
         setForm(form);
         setPreviousQuality(9999);
-        setMu(getPopulationSize() * 10);
+        setLambda(getPopulationSize() * 10);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class StrategyMuPlusLambda extends Strategy {
 		for (int i = 0; i < getIterations(); i++) {
 			children.clear();
 			mutatedChildren.clear();
-			for (int j = 0; j < getMu(); j++) {
+			for (int j = 0; j < getLambda(); j++) {
 				newParents = rouletteWheel();
 				children.add(reproductionStep(newParents.get(0), newParents.get(1)));
 				mutatedChildren.add(mutationStep(children.get(j)));
