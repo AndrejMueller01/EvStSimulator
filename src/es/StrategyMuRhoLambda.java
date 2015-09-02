@@ -30,8 +30,8 @@ public class StrategyMuRhoLambda extends Strategy {
         setIterations(1000);
         setForm(form);
         setPreviousQuality(9999);
-        setMu(getPopulationSize() * 10);
-		children = new ArrayList<Candidate>();
+        setLambda(getPopulationSize() * 10);
+		children = new ArrayList<>();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class StrategyMuRhoLambda extends Strategy {
     }
 
     @Override
-    public Candidate reproductionStep(Candidate father, Candidate mother) {
+    public void reproductionStep(Candidate father, Candidate mother) {
 
 		Candidate child1 = new Candidate();
 		Candidate child2 = new Candidate();
@@ -84,8 +84,6 @@ public class StrategyMuRhoLambda extends Strategy {
 		children.add(child1);
 		children.add(child2);
 
-
-		return child;
     }
 
 	private double calculateStepWidth(Candidate father, Candidate mother){
@@ -130,19 +128,8 @@ public class StrategyMuRhoLambda extends Strategy {
 			value -= 26;
 		characters[pos] = (char) value;
 
-		/*
-        for (int i = 0; i < candidate.length(); i++) {
-            int value = characters[pos] + Math.abs((int) Math.round(r.nextGaussian() * stdDeviation));
-            while (value > z)
-                value -= 26;
-            while (value < a)
-                value += 26;
-			characters[i] = (char) value;
-        }
-        */
 		candidate.setValue(String.valueOf(characters));
 		candidate.setQuality(Quality.function(candidate.getValue(), getTargetString()));
-		//System.out.println(output);
 		return candidate;
 	}
 
@@ -192,9 +179,9 @@ public class StrategyMuRhoLambda extends Strategy {
 		for (int i = 0; i < getIterations(); i++) {
 			children.clear();
 			mutatedChildren.clear();
-			for (int j = 0; j < getMu(); j++) {
+			for (int j = 0; j < getLambda(); j++) {
 				newParents = rouletteWheel();
-				children.add(reproductionStep(newParents.get(0), newParents.get(1)));
+				reproductionStep(newParents.get(0), newParents.get(1));
 				mutatedChildren.add(mutationStep(children.get(j)));
 			}
 			newParents = selectionStep(mutatedChildren);
@@ -206,7 +193,6 @@ public class StrategyMuRhoLambda extends Strategy {
 		for (int i = 0; i < newParents.size(); i++) {
 			Candidate candidate = newParents.get(i);
 			getForm().resultList.append("candidate " + (i + 1) + ": " + candidate.getValue() + " - quality " + candidate.getQuality() + "\n");
-			//getForm().resultList.append( i + ": " + newParents.get(i).getValue()+"\n");
         }
 
         return "Found candidate '" + newParents.get(0).getValue() + "' with quality " + newParents.get(0).getQuality();

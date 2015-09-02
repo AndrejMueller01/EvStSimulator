@@ -18,7 +18,7 @@ public abstract class Strategy {
     private int populationSize;
     private int selectionSize;
     private int iterations;
-    private int mu;
+    private int lambda;
     private String targetString;
     private ArrayList<Candidate> initialConfiguration;
 
@@ -26,7 +26,7 @@ public abstract class Strategy {
 
     public abstract void adjustGui();
 
-    public abstract Candidate reproductionStep(Candidate father, Candidate mother);
+    public abstract void reproductionStep(Candidate father, Candidate mother);
 
     public abstract String mutationStep(String candidate);
 
@@ -179,11 +179,11 @@ public abstract class Strategy {
         this.previousQuality = previousQuality;
     }
 
-    public int getMu() {
-        return mu;
+    public int getLambda() {
+        return lambda;
     }
 
-    public void setMu(int mu) {
-        this.mu = mu;
+    public void setLambda(int lambda) {
+        this.lambda = lambda;
     }
 }

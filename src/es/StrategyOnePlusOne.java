@@ -32,8 +32,7 @@ public class StrategyOnePlusOne extends Strategy {
     }
 
     @Override
-    public Candidate reproductionStep(Candidate father, Candidate mother) {
-        return null;
+    public void reproductionStep(Candidate father, Candidate mother) {
     }
 
     @Override

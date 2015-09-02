@@ -61,7 +61,7 @@ public class StrategyForm extends JFrame {
                 getSelectedStrategy().setTargetString(targetStringTextField.getText());
                 getSelectedStrategy().setIterations(Integer.parseInt(iterationsTextField.getText()));
                 getSelectedStrategy().setPopulationSize(Integer.parseInt(populationSizeTextField.getText()));
-                getSelectedStrategy().setMu(Integer.parseInt(populationSizeTextField.getText()) * 10);
+                getSelectedStrategy().setLambda(Integer.parseInt(populationSizeTextField.getText()) * 10);
 
                 JOptionPane.showMessageDialog(null, getSelectedStrategy().evolution());
             }
